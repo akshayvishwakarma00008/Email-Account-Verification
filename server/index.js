@@ -4,6 +4,7 @@ const app = express()
 const cors = require("cors")
 const DBconnection = require("./db")
 const userRoutes = require("./routes/user")
+const authenticateRoutes = require("./routes/auth")
 
 
 DBconnection()
@@ -13,6 +14,7 @@ app.use(cors());
 
 //routes
 app.use("/api/users",userRoutes)
+app.use("/api/authenticate",authenticateRoutes)
 
 
 

@@ -29,7 +29,8 @@ const registerUser = async (req, res) => {
         }).save();
 
         const url = `${process.env.BASE_URL}/api/users/${user._id}/verify/${token.token}`;
-        await sendMail(user.email, "Verify your email", url);
+        const context = { url: url };
+        await sendMail(user.email, "Verify your email", context,'verification_template');
 
         res.status(201).send({
             message: "User created successfully and a email sent to verify ",
@@ -40,35 +41,35 @@ const registerUser = async (req, res) => {
     }
 }
 
-const verifyUser = async(req,res) =>{
-    console.log("request",req.params);
+const verifyUser = async (req, res) => {
+    console.log("request", req.params);
     try {
-        const user = await User.findOne({_id:req.params.id})
-        if(!user){
-            return res.status(404).send({message:"Invalid Link"});
+        const user = await User.findOne({ _id: req.params.id })
+        if (!user) {
+            return res.status(404).send({ message: "Invalid Link" });
         }
 
         const token = await Token.findOne({
-            userId:user._id,
-            token:req.params.token,
+            userId: user._id,
+            token: req.params.token,
         })
 
-        if (!token){
-            return res.status(404).send({message:"Invalid Link"});
+        if (!token) {
+            return res.status(404).send({ message: "Invalid Link" });
         }
 
         await User.updateOne({
-            _id:user._id,
-            verified:true
+            _id: user._id,
+            verified: true
         })
 
         await Token.deleteOne({ _id: token._id });
 
-        return res.status(200).send({message:"Email Verified Successfully"});
-        
+        return res.status(200).send({ message: "Email Verified Successfully" });
+
     } catch (error) {
         console.log("[+] Something Went Wrong");
-        console.log("[+] error",error);
+        console.log("[+] error", error);
     }
 }
-module.exports = {registerUser, verifyUser};
+module.exports = { registerUser, verifyUser };
